@@ -352,16 +352,19 @@
 const widget = document.getElementById('hot-widget');
 const content = document.getElementById('widget-content');
 
-// Hàm ẩn hiện (Khớp với cái onclick="toggleWidget()" trong HTML của sếp)
+// Hàm ẩn hiện
 function toggleWidget() {
     content.style.display = (content.style.display === 'none') ? 'block' : 'none';
 }
 
-// Chức năng kéo thả
+// CHỈ KÉO KHI NHẤN VÀO VÙNG "ĐẦU" BẢNG (Controls)
+const header = document.getElementById('controls'); 
+
 let isDragging = false;
 let offsetX, offsetY;
 
-widget.onmousedown = (e) => {
+// Sửa lại chỗ này: Thay widget.onmousedown bằng header.onmousedown
+header.onmousedown = (e) => {
     isDragging = true;
     offsetX = e.clientX - widget.offsetLeft;
     offsetY = e.clientY - widget.offsetTop;
