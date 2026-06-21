@@ -298,89 +298,77 @@
     </div>
 </div>
 
-  <script>
-    // Biến lưu trữ modal đang mở để lúc đóng còn biết đường mà tắt nhạc dcm
-    let currentModalId = ''; 
+<script>
+        // --- 1. MODAL & NHẠC ---
+        let currentModalId = ''; 
 
-    function openModal(modalId) {
-        currentModalId = modalId;
-        document.getElementById(modalId).classList.add('active');
-    }
+        function openModal(modalId) {
+            currentModalId = modalId;
+            document.getElementById(modalId).classList.add('active');
+        }
 
-    function closeModal() {
-        if(!currentModalId) return;
-        
-        let modal = document.getElementById(currentModalId);
-        modal.classList.remove('active');
-        
-        // Tắt nhạc CHỈ của cái modal đang mở thôi dcm
-        const audios = modal.querySelectorAll('.char-audio');
-        audios.forEach(audio => { 
-            audio.pause(); 
-            audio.currentTime = 0; 
-        });
-        
-        currentModalId = '';
-    }
-
-    // Nâng cấp quả vuốt lật thẻ tắt nhạc cho N bộ anime dcm
-    const sliders = document.querySelectorAll('.slider-container');
-    let scrollTimeout;
-    sliders.forEach(slider => {
-        slider.addEventListener('scroll', function() {
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                if(!currentModalId) return;
-                let modal = document.getElementById(currentModalId);
-                const audios = modal.querySelectorAll('.char-audio');
-                audios.forEach(audio => audio.pause());
-            }, 150);
-        });
-    });
-
-    // Bấm ra ngoài khoảng không màu đen là tự động đóng bảng dcm
-    window.onclick = function(event) {
-        if (currentModalId) {
+        function closeModal() {
+            if(!currentModalId) return;
             let modal = document.getElementById(currentModalId);
-            if (event.target == modal) {
+            modal.classList.remove('active');
+            const audios = modal.querySelectorAll('.char-audio');
+            audios.forEach(audio => { audio.pause(); audio.currentTime = 0; });
+            currentModalId = '';
+        }
+
+        window.onclick = function(event) {
+            if (currentModalId && event.target == document.getElementById(currentModalId)) {
                 closeModal();
             }
         }
-    }
 
-<script>
-const widget = document.getElementById('hot-widget');
-const content = document.getElementById('widget-content');
+        // --- 2. WIDGET HOT ANIME (KÉO THẢ & ẨN HIỆN) ---
+        const widget = document.getElementById('hot-widget');
+        const content = document.getElementById('widget-content');
+        const header = document.getElementById('controls'); 
 
-// Hàm ẩn hiện
-function toggleWidget() {
-    content.style.display = (content.style.display === 'none') ? 'block' : 'none';
-}
+        function toggleWidget() {
+            content.style.display = (content.style.display === 'none') ? 'block' : 'none';
+        }
 
-// CHỈ KÉO KHI NHẤN VÀO VÙNG "ĐẦU" BẢNG (Controls)
-const header = document.getElementById('controls'); 
+        let isDragging = false;
+        let offsetX, offsetY;
 
-let isDragging = false;
-let offsetX, offsetY;
+        // Xử lý chuột (PC)
+        header.onmousedown = (e) => {
+            isDragging = true;
+            offsetX = e.clientX - widget.offsetLeft;
+            offsetY = e.clientY - widget.offsetTop;
+        };
 
-// Sửa lại chỗ này: Thay widget.onmousedown bằng header.onmousedown
-header.onmousedown = (e) => {
-    isDragging = true;
-    offsetX = e.clientX - widget.offsetLeft;
-    offsetY = e.clientY - widget.offsetTop;
-};
+        document.onmousemove = (e) => {
+            if (!isDragging) return;
+            widget.style.left = (e.clientX - offsetX) + 'px';
+            widget.style.top = (e.clientY - offsetY) + 'px';
+            widget.style.right = 'auto'; 
+            widget.style.bottom = 'auto';
+        };
 
-document.onmousemove = (e) => {
-    if (!isDragging) return;
-    widget.style.left = (e.clientX - offsetX) + 'px';
-    widget.style.top = (e.clientY - offsetY) + 'px';
-    widget.style.right = 'auto'; 
-    widget.style.bottom = 'auto';
-};
+        document.onmouseup = () => { isDragging = false; };
 
-document.onmouseup = () => { isDragging = false; };
-</script>
-      
-  </script>
+        // Xử lý cảm ứng (Mobile - Để sếp kéo trên điện thoại)
+        header.ontouchstart = (e) => {
+            isDragging = true;
+            let touch = e.touches[0];
+            offsetX = touch.clientX - widget.offsetLeft;
+            offsetY = touch.clientY - widget.offsetTop;
+        };
+
+        document.ontouchmove = (e) => {
+            if (!isDragging) return;
+            let touch = e.touches[0];
+            widget.style.left = (touch.clientX - offsetX) + 'px';
+            widget.style.top = (touch.clientY - offsetY) + 'px';
+            widget.style.right = 'auto'; 
+            widget.style.bottom = 'auto';
+        };
+
+        document.ontouchend = () => { isDragging = false; };
+    </script>
  </body>
 </html>
