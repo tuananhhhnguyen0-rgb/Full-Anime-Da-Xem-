@@ -401,7 +401,7 @@
     // SỬA CHỖ NÀY: Dùng window thay vì document để bắt sự kiện chuẩn hơn
     window.addEventListener('mousemove', (e) => {
         if (!isDragging) return; // Nếu không nhấn vào header thì KHÔNG LÀM GÌ CẢ
-        e.preventDefault(); 
+        // e.preventDefault()
         widget.style.left = (e.clientX - offsetX) + 'px';
         widget.style.top = (e.clientY - offsetY) + 'px';
         widget.style.right = 'auto'; widget.style.bottom = 'auto';
