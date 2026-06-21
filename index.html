@@ -192,6 +192,31 @@
     object-fit: cover;
     border-radius: 6px;
 }
+
+  /* Nút ẩn hiện */
+.toggle-btn {
+    cursor: pointer;
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 5px;
+    margin-bottom: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    line-height: 25px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Class ẩn nội dung */
+.hidden-list .list-content {
+    display: none;
+}
+
+.hidden-list {
+    width: 50px !important; /* Khi ẩn chỉ còn cái nút tròn */
+}      
     </style>
 </head>
 <body>
@@ -271,6 +296,18 @@
         <img src="LINK_ẢNH_BO_3" alt="Anime">
         <span>Tên bộ 3</span>
     </div>
+
+        <div class="hot-list" id="hotList">
+            <!-- Nút đóng mở -->
+            <div class="toggle-btn" onclick="toggleHotList()">🔥</div>
+    
+            <div class="list-content">
+                <h3>Hot Anime</h3>
+            <!-- 3 cái hot-item của sếp ở đây -->
+                <div class="hot-item" onclick="openModal('animeModal')">...</div>
+                ...
+            </div>
+        </div>
 </div>
 
   <script>
@@ -322,6 +359,11 @@
             }
         }
     }
+function toggleHotList() {
+    const list = document.getElementById('hotList');
+    list.classList.toggle('hidden-list');
+}
+      
   </script>
  </body>
 </html>
