@@ -323,63 +323,80 @@
 </div>
 
 <script>
+    // --- 1. MODAL & NHẠC ---
+    let currentModalId = ''; 
+    function openModal(modalId) {
+        currentModalId = modalId;
+        document.getElementById(modalId).classList.add('active');
+    }
+    function closeModal() {
+        if(!currentModalId) return;
+        let modal = document.getElementById(currentModalId);
+        modal.classList.remove('active');
+        const audios = modal.querySelectorAll('.char-audio');
+        audios.forEach(audio => { audio.pause(); audio.currentTime = 0; });
+        currentModalId = '';
+    }
+    window.onclick = function(event) {
+        if (currentModalId && event.target == document.getElementById(currentModalId)) {
+            closeModal();
+        }
+    }
+
+    // --- 2. WIDGET KÉO THẢ & HÚT CẠNH (ĐÃ FIX LỖI CLICK) ---
     const widget = document.getElementById('hot-widget');
     const content = document.getElementById('widget-content');
     const header = document.getElementById('controls'); 
 
-    // Hàm ẩn/hiện bảng
     function toggleWidget() {
         if (content.style.display === 'none') {
             content.style.display = 'block';
-            widget.style.width = '160px'; // Độ rộng cũ
+            widget.style.width = '160px';
         } else {
             content.style.display = 'none';
-            widget.style.width = 'auto'; // Co lại cho gọn
+            widget.style.width = 'auto';
         }
     }
 
     let isDragging = false;
     let offsetX, offsetY;
 
-    const startDragging = (e) => {
+    // Chỉ bắt đầu kéo nếu nhấn vào đúng cái header (nơi chứa lửa và dấu X)
+    header.onmousedown = (e) => {
         isDragging = true;
-        let clientX = e.clientX || e.touches[0].clientX;
-        let clientY = e.clientY || e.touches[0].clientY;
-        offsetX = clientX - widget.offsetLeft;
-        offsetY = clientY - widget.offsetTop;
-        
-        // Chặn không cho trang web cuộn khi đang kéo
-        e.preventDefault(); 
+        offsetX = e.clientX - widget.offsetLeft;
+        offsetY = e.clientY - widget.offsetTop;
+    };
+    header.ontouchstart = (e) => {
+        isDragging = true;
+        offsetX = e.touches[0].clientX - widget.offsetLeft;
+        offsetY = e.touches[0].clientY - widget.offsetTop;
     };
 
-    const drag = (e) => {
+    document.onmousemove = (e) => {
         if (!isDragging) return;
-        e.preventDefault(); // Chặn cuộn trang web
-        let clientX = e.clientX || e.touches[0].clientX;
-        let clientY = e.clientY || e.touches[0].clientY;
-        
-        widget.style.left = (clientX - offsetX) + 'px';
-        widget.style.top = (clientY - offsetY) + 'px';
+        widget.style.left = (e.clientX - offsetX) + 'px';
+        widget.style.top = (e.clientY - offsetY) + 'px';
+        widget.style.right = 'auto'; 
+        widget.style.bottom = 'auto';
+    };
+    document.ontouchmove = (e) => {
+        if (!isDragging) return;
+        widget.style.left = (e.touches[0].clientX - offsetX) + 'px';
+        widget.style.top = (e.touches[0].clientY - offsetY) + 'px';
         widget.style.right = 'auto'; 
         widget.style.bottom = 'auto';
     };
 
-    const stopDragging = () => {
+    document.onmouseup = document.ontouchend = () => {
         if (!isDragging) return;
         isDragging = false;
-        
-        // HÚT VÀO CẠNH PHẢI (Nếu cách lề phải < 100px)
+        // Hút cạnh phải
         let windowWidth = window.innerWidth;
         if (widget.offsetLeft + widget.offsetWidth / 2 > windowWidth / 2) {
             widget.style.left = (windowWidth - widget.offsetWidth - 10) + 'px';
         }
     };
-
-    header.onmousedown = startDragging;
-    header.ontouchstart = startDragging;
-    document.onmousemove = drag;
-    document.ontouchmove = drag;
-    document.onmouseup = document.ontouchend = stopDragging;
 </script>
  </body>
 </html>
