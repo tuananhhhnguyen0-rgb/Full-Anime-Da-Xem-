@@ -158,16 +158,39 @@
             60% {transform: translateX(5px);}
         }
         .hot-list {
-    position: fixed;   /* Bay lơ lửng dcm */
-    top: 50px;         /* Cách mép trên 50px */
-    right: 20px;       /* Cách mép phải 20px */
-    width: 200px;
-    background: rgba(22, 27, 34, 0.9);
-    padding: 15px;
-    border-radius: 15px;
-    border: 2px solid #00e5ff;
-    z-index: 9999;     /* Luôn nổi trên cùng */
-    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+    position: fixed;
+    bottom: 20px;       /* Đưa xuống dưới */
+    right: 20px;        /* Căn sang phải */
+    width: 160px;       /* Thu nhỏ chiều ngang */
+    background: rgba(10, 12, 16, 0.85); /* Nền hơi trong suốt tí cho sang */
+    padding: 10px;
+    border-radius: 12px;
+    border: none;       /* BỎ VIỀN XANH DCM */
+    z-index: 9999;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5); /* Đổ bóng nhẹ thay cho viền */
+}
+
+.hot-list h3 {
+    font-size: 0.9rem;  /* Chữ nhỏ lại */
+    margin: 0 0 8px 0;
+    text-align: center;
+    color: #dca7ff;
+}
+
+.hot-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    cursor: pointer;
+    font-size: 0.8rem; /* Chữ nhỏ để không che nội dung */
+}
+
+.hot-item img {
+    width: 35px;        /* Ảnh nhỏ xinh */
+    height: 35px;
+    object-fit: cover;
+    border-radius: 6px;
 }
     </style>
 </head>
@@ -232,23 +255,20 @@
 </div>
 
     <div class="hot-list">
-    <h3 style="margin-top:0; text-align:center; color: #dca7ff;">🔥 Hot Anime</h3>
+    <h3>🔥 Hot Anime</h3>
     
-    <!-- SLOT 1 -->
     <div class="hot-item" onclick="openModal('animeModal')">
-        <img src="https://images.unsplash.com/photo-1541562232579-512a21360020?q=80&w=100&auto=format&fit=crop" alt="Anime">
+        <img src="https://images.unsplash.com/photo-1541562232579-512a21360020?q=80&w=100" alt="Niji">
         <span>Nijigasaki</span>
     </div>
 
-    <!-- SLOT 2: Sếp thay link ảnh & ID modal vào đây -->
-    <div class="hot-item" onclick="openModal('modal_id_bo_2')">
-        <img src="LINK_ẢNH_BỘ_2" alt="Anime">
+    <div class="hot-item" onclick="openModal('ID_BO_2')">
+        <img src="LINK_ẢNH_BO_2" alt="Anime">
         <span>Tên bộ 2</span>
     </div>
 
-    <!-- SLOT 3: Sếp thay link ảnh & ID modal vào đây -->
-    <div class="hot-item" onclick="openModal('modal_id_bo_3')">
-        <img src="LINK_ẢNH_BỘ_3" alt="Anime">
+    <div class="hot-item" onclick="openModal('ID_BO_3')">
+        <img src="LINK_ẢNH_BO_3" alt="Anime">
         <span>Tên bộ 3</span>
     </div>
 </div>
