@@ -193,27 +193,20 @@
     border-radius: 6px;
 }
 
-#hot-widget {
+.hot-list {
     position: fixed;
     bottom: 20px; right: 20px;
     z-index: 9999;
-    cursor: grab; /* Chỉ báo là có thể kéo */
-    user-select: none;
-}
-#list-content {
-    width: 160px;
-    background: #161b22;
+    cursor: move; /* Để sếp biết chỗ này cầm kéo được */
+    background: rgba(22, 27, 34, 0.9);
     padding: 10px;
     border-radius: 12px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    user-select: none;
+    width: 160px;
 }
-#open-btn {
-    display: none; /* Mặc định ẩn nút lửa */
-    font-size: 2rem;
-    cursor: pointer;
-}
-.hidden-mode #list-content { display: none; }
-.hidden-mode #open-btn { display: block; }     
+.hot-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+.hot-item img { width: 35px; height: 35px; object-fit: cover; border-radius: 6px; }   
     </style>
 </head>
 <body>
@@ -276,38 +269,32 @@
     </div>
 </div>
 
-    <div class="hot-list">
-    <h3>🔥 Hot Anime</h3>
+    <!-- Bọc toàn bộ cái bảng cũ vào đây -->
+<div id="hot-widget" class="hot-list">
     
-    <div class="hot-item" onclick="openModal('animeModal')">
-        <img src="https://images.unsplash.com/photo-1541562232579-512a21360020?q=80&w=100" alt="Niji">
-        <span>Nijigasaki</span>
+    <!-- Nút "Điều khiển" đặt trên cùng -->
+    <div id="controls" style="text-align: right; cursor: pointer; padding-bottom: 5px;">
+        <span onclick="toggleWidget()">🔥 / ✕</span>
     </div>
 
-    <div class="hot-item" onclick="openModal('ID_BO_2')">
-        <img src="LINK_ẢNH_BO_2" alt="Anime">
-        <span>Tên bộ 2</span>
-    </div>
-
-    <div class="hot-item" onclick="openModal('ID_BO_3')">
-        <img src="LINK_ẢNH_BO_3" alt="Anime">
-        <span>Tên bộ 3</span>
-    </div>
-
-<div id="hot-widget" class="draggable">
-    <!-- Nút hiển thị khi đang đóng -->
-    <div id="open-btn" class="hidden">🔥</div>
-    
-    <!-- Nội dung bảng (bọc trong list-content) -->
-    <div id="list-content">
-        <div class="header">
-            <h3>🔥 Hot Anime</h3>
-            <span onclick="hideWidget()" style="cursor:pointer">✕</span>
+    <!-- Nội dung bảng cũ của sếp -->
+    <div id="widget-content">
+        <h3>🔥 Hot Anime</h3>
+        
+        <div class="hot-item" onclick="openModal('animeModal')">
+            <img src="https://images.unsplash.com/photo-1541562232579-512a21360020?q=80&w=100" alt="Niji">
+            <span>Nijigasaki</span>
         </div>
-        <!-- 3 bộ anime của sếp -->
-        <div class="hot-item">...</div>
-        <div class="hot-item">...</div>
-    </div>
+
+        <div class="hot-item" onclick="openModal('ID_BO_2')">
+            <img src="LINK_ẢNH_BO_2" alt="Anime">
+            <span>Tên bộ 2</span>
+        </div>
+
+        <div class="hot-item" onclick="openModal('ID_BO_3')">
+            <img src="LINK_ẢNH_BO_3" alt="Anime">
+            <span>Tên bộ 3</span>
+        </div>
     </div>
 </div>
 
@@ -361,28 +348,35 @@
         }
     }
 
-    const widget = document.getElementById('hot-widget');
+<script>
+const widget = document.getElementById('hot-widget');
+const content = document.getElementById('widget-content');
 
-// Chức năng ẩn
-function hideWidget() {
-    widget.classList.add('hidden-mode');
+// Hàm ẩn hiện (Khớp với cái onclick="toggleWidget()" trong HTML của sếp)
+function toggleWidget() {
+    content.style.display = (content.style.display === 'none') ? 'block' : 'none';
 }
 
-// Chức năng hiện
-document.getElementById('open-btn').onclick = () => {
-    widget.classList.remove('hidden-mode');
+// Chức năng kéo thả
+let isDragging = false;
+let offsetX, offsetY;
+
+widget.onmousedown = (e) => {
+    isDragging = true;
+    offsetX = e.clientX - widget.offsetLeft;
+    offsetY = e.clientY - widget.offsetTop;
 };
 
-// Chức năng kéo thả (Draggable)
-let isDragging = false;
-widget.onmousedown = (e) => { isDragging = true; };
 document.onmousemove = (e) => {
     if (!isDragging) return;
-    widget.style.left = e.clientX - 50 + 'px';
-    widget.style.top = e.clientY - 20 + 'px';
-    widget.style.right = 'auto'; widget.style.bottom = 'auto';
+    widget.style.left = (e.clientX - offsetX) + 'px';
+    widget.style.top = (e.clientY - offsetY) + 'px';
+    widget.style.right = 'auto'; 
+    widget.style.bottom = 'auto';
 };
+
 document.onmouseup = () => { isDragging = false; };
+</script>
       
   </script>
  </body>
