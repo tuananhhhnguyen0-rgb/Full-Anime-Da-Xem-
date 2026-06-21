@@ -193,30 +193,27 @@
     border-radius: 6px;
 }
 
-  /* Nút ẩn hiện */
-.toggle-btn {
+#hot-widget {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    z-index: 9999;
+    cursor: grab; /* Chỉ báo là có thể kéo */
+    user-select: none;
+}
+#list-content {
+    width: 160px;
+    background: #161b22;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+#open-btn {
+    display: none; /* Mặc định ẩn nút lửa */
+    font-size: 2rem;
     cursor: pointer;
-    text-align: center;
-    font-size: 1.2rem;
-    padding: 5px;
-    margin-bottom: 5px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    line-height: 25px;
-    margin-left: auto;
-    margin-right: auto;
 }
-
-/* Class ẩn nội dung */
-.hidden-list .list-content {
-    display: none;
-}
-
-.hidden-list {
-    width: 50px !important; /* Khi ẩn chỉ còn cái nút tròn */
-}      
+.hidden-mode #list-content { display: none; }
+.hidden-mode #open-btn { display: block; }     
     </style>
 </head>
 <body>
@@ -297,17 +294,21 @@
         <span>Tên bộ 3</span>
     </div>
 
-        <div class="hot-list" id="hotList">
-            <!-- Nút đóng mở -->
-            <div class="toggle-btn" onclick="toggleHotList()">🔥</div>
+<div id="hot-widget" class="draggable">
+    <!-- Nút hiển thị khi đang đóng -->
+    <div id="open-btn" class="hidden">🔥</div>
     
-            <div class="list-content">
-                <h3>Hot Anime</h3>
-            <!-- 3 cái hot-item của sếp ở đây -->
-                <div class="hot-item" onclick="openModal('animeModal')">...</div>
-                ...
-            </div>
+    <!-- Nội dung bảng (bọc trong list-content) -->
+    <div id="list-content">
+        <div class="header">
+            <h3>🔥 Hot Anime</h3>
+            <span onclick="hideWidget()" style="cursor:pointer">✕</span>
         </div>
+        <!-- 3 bộ anime của sếp -->
+        <div class="hot-item">...</div>
+        <div class="hot-item">...</div>
+    </div>
+    </div>
 </div>
 
   <script>
@@ -359,10 +360,29 @@
             }
         }
     }
-function toggleHotList() {
-    const list = document.getElementById('hotList');
-    list.classList.toggle('hidden-list');
+
+    const widget = document.getElementById('hot-widget');
+
+// Chức năng ẩn
+function hideWidget() {
+    widget.classList.add('hidden-mode');
 }
+
+// Chức năng hiện
+document.getElementById('open-btn').onclick = () => {
+    widget.classList.remove('hidden-mode');
+};
+
+// Chức năng kéo thả (Draggable)
+let isDragging = false;
+widget.onmousedown = (e) => { isDragging = true; };
+document.onmousemove = (e) => {
+    if (!isDragging) return;
+    widget.style.left = e.clientX - 50 + 'px';
+    widget.style.top = e.clientY - 20 + 'px';
+    widget.style.right = 'auto'; widget.style.bottom = 'auto';
+};
+document.onmouseup = () => { isDragging = false; };
       
   </script>
  </body>
