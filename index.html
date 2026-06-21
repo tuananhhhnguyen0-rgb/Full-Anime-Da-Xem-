@@ -336,18 +336,33 @@
 </div>
 
 <script>
+    // --- 1. MODAL & NHẠC ---
+    let currentModalId = ''; 
+    function openModal(modalId) {
+        currentModalId = modalId;
+        document.getElementById(modalId).classList.add('active');
+    }
+    function closeModal() {
+        if(!currentModalId) return;
+        let modal = document.getElementById(currentModalId);
+        modal.classList.remove('active');
+        const audios = modal.querySelectorAll('.char-audio');
+        audios.forEach(audio => { audio.pause(); audio.currentTime = 0; });
+        currentModalId = '';
+    }
+    window.onclick = (e) => {
+        if (currentModalId && e.target == document.getElementById(currentModalId)) closeModal();
+    };
+
+    // --- 2. WIDGET KÉO THẢ (FIX LỖI CLICK) ---
     const widget = document.getElementById('hot-widget');
     const content = document.getElementById('widget-content');
     const header = document.getElementById('controls');
 
-    // Hàm ẩn hiện & Ép về cạnh phải
     function toggleWidget() {
         if (content.style.display === 'none') {
             content.style.display = 'block';
             widget.style.width = '160px';
-            // Khi mở ra, ép về cạnh phải ngay lập tức
-            widget.style.left = 'auto';
-            widget.style.right = '10px';
         } else {
             content.style.display = 'none';
             widget.style.width = 'auto';
@@ -357,53 +372,48 @@
     let isDragging = false;
     let offsetX, offsetY;
 
-    const startDragging = (e) => {
+    // CHỈ BẮT ĐẦU KÉO KHI NHẤN VÀO HEADER
+    header.addEventListener('mousedown', (e) => {
         isDragging = true;
-        // Lấy tọa độ dựa trên thiết bị
-        let clientX = e.clientX || e.touches[0].clientX;
-        let clientY = e.clientY || e.touches[0].clientY;
-        offsetX = clientX - widget.offsetLeft;
-        offsetY = clientY - widget.offsetTop;
-    };
+        offsetX = e.clientX - widget.offsetLeft;
+        offsetY = e.clientY - widget.offsetTop;
+    });
 
-    const drag = (e) => {
+    header.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        offsetX = e.touches[0].clientX - widget.offsetLeft;
+        offsetY = e.touches[0].clientY - widget.offsetTop;
+    }, {passive: false});
+
+    document.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
-        let clientX = e.clientX || e.touches[0].clientX;
-        let clientY = e.clientY || e.touches[0].clientY;
-        
-        widget.style.left = (clientX - offsetX) + 'px';
-        widget.style.top = (clientY - offsetY) + 'px';
-        widget.style.right = 'auto'; 
-        widget.style.bottom = 'auto';
-    };
+        widget.style.left = (e.clientX - offsetX) + 'px';
+        widget.style.top = (e.clientY - offsetY) + 'px';
+        widget.style.right = 'auto'; widget.style.bottom = 'auto';
+    });
 
-    const stopDragging = () => {
+    document.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        widget.style.left = (e.touches[0].clientX - offsetX) + 'px';
+        widget.style.top = (e.touches[0].clientY - offsetY) + 'px';
+        widget.style.right = 'auto'; widget.style.bottom = 'auto';
+    }, {passive: false});
+
+    document.addEventListener('mouseup', stopDrag);
+    document.addEventListener('touchend', stopDrag);
+
+    function stopDrag() {
         if (!isDragging) return;
         isDragging = false;
-
-        // Ép bảng không được vượt quá lề màn hình
+        // Hút cạnh
         let winW = window.innerWidth;
-        let winH = window.innerHeight;
-        
-        // Hút về cạnh phải nếu nằm ở nửa phải màn hình
         if (widget.offsetLeft + widget.offsetWidth / 2 > winW / 2) {
             widget.style.left = (winW - widget.offsetWidth - 10) + 'px';
-            widget.style.right = 'auto';
         } else {
-            // Hút về cạnh trái nếu nằm ở nửa trái
             widget.style.left = '10px';
-            widget.style.right = 'auto';
         }
-        
-        // Đảm bảo không bị kéo quá lên trên hoặc xuống dưới
-        if (widget.offsetTop < 10) widget.style.top = '10px';
-    };
-
-    header.onmousedown = startDragging;
-    header.ontouchstart = startDragging;
-    document.onmousemove = drag;
-    document.ontouchmove = drag;
-    document.onmouseup = document.ontouchend = stopDragging;
+        widget.style.right = 'auto';
+    }
 </script>
  </body>
 </html>
