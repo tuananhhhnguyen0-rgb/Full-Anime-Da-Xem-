@@ -1,0 +1,2672 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kho Lưu Trữ Anime Của Chiến Thần</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ================= 1. NỀN KHÔNG GIAN BÊN DƯỚI ================= */
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Nunito', sans-serif; 
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat top center;
+            z-index: -1; opacity: 0.5;
+        }
+
+        /* ================= 2. BANNER & CHỮ NHẸ NHÀNG CHILL CHILL ================= */
+        .hero-banner {
+            text-align: center;
+            padding: 100px 20px;
+            background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)), 
+                        url('anhbiaa.jpg') center/cover;
+            border-bottom: 2px solid #2a3342;
+        }
+        .hero-banner h1 {
+            font-family: 'Dancing Script', cursive; /* Phông chữ uốn lượn thanh lịch dcm */
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin: 0;
+            color: #dca7ff; /* Màu tím pastel nhẹ nhàng giống ảnh sếp gửi */
+            text-shadow: 2px 4px 10px rgba(0,0,0,0.5); /* Bóng đổ mềm để chữ dễ đọc trên nền ảnh */
+            letter-spacing: 1px;
+            text-transform: none; /* Để nguyên chữ hoa chữ thường cho nó tự nhiên */
+        }
+
+        /* ================= 3. LƯỚI ANIME RESPONSIVE ================= */
+        .container {
+            max-width: 1200px; margin: 40px auto; padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .hero-banner h1 { font-size: 3rem; }
+        }
+
+        .anime-card {
+            background-color: #161b22; border-radius: 15px;
+            overflow: hidden; position: relative; cursor: pointer;
+            transition: all 0.3s ease; border: 2px solid #30363d;
+        }
+        
+        /* TRẢ LẠI HIỆU ỨNG SÁNG XUNG QUANH KHI DI CHUỘT DCM */
+        .anime-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 0 25px #00e5ff; /* Sáng Glow màu xanh dương */
+            border-color: #00e5ff;
+        }
+
+        .anime-img { width: 100%; height: 400px; object-fit: cover; }
+        .anime-info { padding: 15px; text-align: center; }
+        .anime-title { font-size: 1.3rem; margin: 0 0 10px 0; color: #e6edf3; font-weight: bold;}
+        
+        .badge-container { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .badge { background: #dca7ff; color: #000; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
+        .badge.blue { background: #00e5ff; color: #000;}
+
+        /* ================= 4. MODAL & THẺ BÀI NHÂN VẬT VUỐT NGANG ================= */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 12, 16, 0.95); z-index: 1000;
+            justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal.active { display: flex; opacity: 1; }
+        
+        .modal-content {
+            width: 100%; max-width: 450px; 
+            background: transparent;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute; top: -50px; right: 10px; font-size: 2.5rem; color: #8b949e;
+            cursor: pointer; z-index: 10; transition: color 0.2s;
+        }
+        .close-btn:hover { color: #fff; }
+
+        .slider-container {
+            display: flex; overflow-x: auto;
+            scroll-snap-type: x mandatory; scroll-behavior: smooth;
+            -ms-overflow-style: none; scrollbar-width: none; 
+        }
+        .slider-container::-webkit-scrollbar { display: none; }
+
+        .char-slide {
+            flex: 0 0 100%; scroll-snap-align: center;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 20px 0; /* Tăng padding để lấy chỗ cho bóng đổ */
+        }
+
+        /* KHUNG NHÂN VẬT: BỎ VIỀN, NỔI BẬT LÊN BẰNG SHADOW NHƯ ẢNH DCM */
+        .char-card-box {
+            background: #1e2130; /* Nền xám nhạt hơn màu modal để tạo cảm giác nổi */
+            padding: 20px;
+            border-radius: 16px;
+            border: none; /* DIỆT GỌN CÁI VIỀN ĐỎ QUÊ MÙA KKK */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); /* Đổ bóng mềm phía dưới làm thẻ nổi lềnh phềnh */
+            text-align: center;
+            width: 90%;
+        }
+
+        .char-img-vertical {
+            width: 100%; height: 350px; object-fit: cover;
+            border-radius: 10px;
+            border: none; /* Bỏ viền ảnh luôn cho mượt */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4); /* Ảnh cũng nổi nhẹ trên thẻ */
+            margin-bottom: 15px;
+            background-color: #0d1117; 
+        }
+
+        .char-name {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.8rem;
+            color: #dca7ff; /* Đổi màu chữ theo tone pastel cho đồng bộ */
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .audio-player-box {
+            width: 100%;
+            background: #141722; /* Màu đậm hơn nền thẻ một tí tạo chiều sâu */
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            box-sizing: border-box;
+        }
+        .audio-player-box p { margin: 0 0 10px 0; color: #a1aab8; font-weight: bold; font-size: 0.9rem;}
+        
+        audio { width: 100%; outline: none; height: 35px; border-radius: 20px;}
+
+        .swipe-hint {
+            text-align: center; color: #8b949e; margin-top: 5px; font-size: 0.9rem;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateX(0);}
+            40% {transform: translateX(10px);}
+            60% {transform: translateX(5px);}
+        }
+        .hot-list {
+    position: fixed;
+    bottom: 20px;       /* Đưa xuống dưới */
+    right: 20px;        /* Căn sang phải */
+    width: 160px;       /* Thu nhỏ chiều ngang */
+    background: rgba(10, 12, 16, 0.85); /* Nền hơi trong suốt tí cho sang */
+    padding: 10px;
+    border-radius: 12px;
+    border: none;       /* BỎ VIỀN XANH DCM */
+    z-index: 9999;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5); /* Đổ bóng nhẹ thay cho viền */
+}
+
+.hot-list h3 {
+    font-size: 0.9rem;  /* Chữ nhỏ lại */
+    margin: 0 0 8px 0;
+    text-align: center;
+    color: #dca7ff;
+}
+
+.hot-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    cursor: pointer;
+    font-size: 0.8rem; /* Chữ nhỏ để không che nội dung */
+}
+
+.hot-item img {
+    width: 35px;        /* Ảnh nhỏ xinh */
+    height: 35px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.hot-list {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    z-index: 9999;
+    cursor: move; /* Để sếp biết chỗ này cầm kéo được */
+    background: rgba(22, 27, 34, 0.9);
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    user-select: none;
+    width: 160px;
+}
+.hot-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+.hot-item img { width: 35px; height: 35px; object-fit: cover; border-radius: 6px; } 
+
+        /* Thêm vào trong thẻ <style> của sếp */
+
+#controls {
+    display: flex;
+    justify-content: flex-end; /* Đẩy nội dung (lửa + X) sang phải */
+    align-items: center;
+    gap: 10px;
+    cursor: pointer; /* Cho biết chỗ này nhấn được */
+    padding: 5px;
+}
+
+#widget-content {
+    transition: display 0.3s; /* Tạo hiệu ứng mượt khi ẩn hiện */
+}
+
+#hot-widget {
+    touch-action: none; /* Quan trọng: Chặn cuộn trang khi kéo widget */
+    position: fixed;
+    z-index: 9999; /* Luôn nổi trên cùng, không bị đè bởi ảnh khác */
+    background: rgba(0, 0, 0, 0.8); /* Màu nền cho đẹp */
+    border-radius: 10px;
+    padding: 10px;
+}
+#hot-widget {
+    position: fixed;
+    z-index: 9999;
+    background: rgba(22, 27, 34, 0.9);
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    touch-action: none; 
+    transition: width 0.3s ease; /* Mượt mà khi đóng/mở */
+    right: 10px; /* Mặc định dính phải */
+    bottom: 20px;
+}
+
+#hot-widget {
+    position: fixed;
+    z-index: 9999;
+    /* Các thuộc tính sếp đang dùng như background, padding, v.v... */
+    
+    /* Dòng này cực kỳ quan trọng để đảm bảo nó "nhạy" click */
+    pointer-events: auto; 
+    
+    /* Thêm cái này để tránh việc nó chiếm dụng toàn bộ không gian (nếu cần) */
+    /* Chỉ khi nào sếp muốn click xuyên qua cái widget thì mới để là none, 
+       nhưng ở đây sếp muốn tương tác nên phải là auto */
+}
+        
+    </style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<div class="hero-banner">
+    <h1>Tổng hợp Anime đã xem</h1>
+</div>
+
+<!--CONTAINER CỦA FULL MẶT BỘ ANIME-->
+<div class="container">
+
+<div class="anime-card" onclick="openModal('The Duke of Death and His Maid')">
+        <div class="badge-container">
+            <span class="badge">12/36 Tập Vì lười xem</span>
+            <span class="badge blue">Chuyển thể full manga</span>
+        </div>
+        <img class="anime-img" src="The Duke of Death and His Maid/The Duke of Death and His Maid.jpeg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">The Duke of Death and His Maid<br>
+    <span style="font-size: 1.2rem; ">(Shinigami Bocchan to Kuro Maido) <br>(Công Tước Tử Thần Và Cô Hầu Gái)</span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+</div>
+
+<div class="anime-card" onclick="openModal('Onii-chan wa Oshimai!')">
+        <div class="badge-container">
+            <span class="badge">7/12 Tập chưa xem</span>
+            <span class="badge blue">Vì đợi mua manga</span>
+        </div>
+        <img class="anime-img" src="Onii-chan wa Oshimai!/Onii-chan wa Oshimai!.jpg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Onii-chan wa Oshimai!<br>
+    <span style="font-size: 1.2rem; "></span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+</div>
+
+<div class="anime-card" onclick="openModal('Citrus')">
+        <div class="badge-container">
+            <span class="badge">12/12 Tập</span>
+            <span class="badge blue">Chưa đọc manga</span>
+        </div>
+        <img class="anime-img" src="Citrus/Citrus.jpeg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Citrus<br>(Hương Vị Lạ Kỳ)
+    <span style="font-size: 1.2rem; "></span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+</div>
+    
+<div class="anime-card" onclick="openModal('Your Name')">
+        <div class="badge-container">
+            <span class="badge">1/1 Tập</span>
+            <span class="badge blue">Chưa đọc manga</span>
+        </div>
+        <img class="anime-img" src="Your Name/Your Name.png" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Your Name<br>(Tên cậu là gì?)
+    <span style="font-size: 1.2rem; "></span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+</div>
+
+<div class="anime-card" onclick="openModal('Sakura Trick')">
+        <div class="badge-container">
+            <span class="badge">12/12 Tập</span>
+            <span class="badge blue">Chưa đọc manga</span>
+        </div>
+        <img class="anime-img" src="Sakura Trick/Sakura Trick.jpeg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Sakura Trick<br> 
+    <span style="font-size: 1.2rem; ">(Hoa Anh Đào Tinh Nghịch)</span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+</div>
+
+<div class="anime-card" onclick="openModal('Fragtime')">
+        <div class="badge-container">
+            <span class="badge">1/1 Tập OVA</span>
+            <span class="badge blue">Chưa đọc manga</span>
+        </div>
+        <img class="anime-img" src="Fragtime/Fragtime.jpeg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title"> Fragtime<br> 
+    <span style="font-size: 1.2rem; ">  </span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+</div>
+
+<div class="anime-card" onclick="openModal('Bloom Into You')">
+        <div class="badge-container">
+            <span class="badge">13/13 Tập</span>
+            <span class="badge blue">Đang đọc manga</span>
+        </div>
+        <img class="anime-img" src="Bloom Into You/Bloom Into You.jpeg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Bloom Into You<br> 
+    <span style="font-size: 1.2rem; "> (Rồi Hoa Sẽ Nở) </span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+    </div>
+
+<div class="anime-card" onclick="openModal('Naruto')">
+        <div class="badge-container">
+            <span class="badge">700/700 Tập</span>
+            <span class="badge blue">Chưa xem Boruto</span>
+        </div>
+        <img class="anime-img" src="Naruto/Naruto.jpeg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Naruto<br> 
+    <span style="font-size: 1.2rem; ">  </span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+    </div> 
+
+<div class="anime-card" onclick="openModal('Sunohara-so no Kanrinin-san')">
+        <div class="badge-container">
+            <span class="badge">7/12 Tập</span>
+            <span class="badge blue">Chưa đọc manga</span>
+        </div>
+        <img class="anime-img" src="Sunohara-so no Kanrinin-san/Sunohara-so no Kanrinin-san.jpeg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Sunohara-so no Kanrinin-san<br> 
+    <span style="font-size: 1.2rem; ">  </span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+    </div> 
+
+<div class="anime-card" onclick="openModal('Gj-bu')">
+        <div class="badge-container">
+            <span class="badge">13/13 Tập</span>
+            <span class="badge blue">Không có manga</span>
+        </div>
+        <img class="anime-img" src="Gj-bu/Gj-bu.jpeg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Gj-bu<br> 
+    <span style="font-size: 1.2rem; "> (Câu Lạc Bộ Giỏi Và Sành Sỏi) </span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+    </div> 
+
+<div class="anime-card" onclick="openModal('Secret Princess Himegoto')">
+        <div class="badge-container">
+            <span class="badge">13/13 Tập</span>
+            <span class="badge blue">Chưa đọc manga</span>
+        </div>
+        <img class="anime-img" src="Secret Princess Himegoto/Secret Princess Himegoto.jpg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Secret Princess Himegoto <br>
+    <span style="font-size: 1.2rem; "> </span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+    </div>    
+
+<div class="anime-card" onclick="openModal('Sasayaku You ni Koi wo Utau')">
+        <div class="badge-container">
+            <span class="badge">12/12 Tập</span>
+            <span class="badge blue">Chưa đọc manga</span>
+        </div>
+        <img class="anime-img" src="Sasayaku You ni Koi wo Utau/Sasayaku You ni Koi wo Utau.jpg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Sasayaku You ni Koi wo Utau <br>
+    <span style="font-size: 1.2rem; ">(Khẽ Hát Lời Yêu)</span></h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+    </div>
+
+    <div class="anime-card" onclick="openModal('Kase-san Series')">
+        <div class="badge-container">
+            <span class="badge">5/5 Tập (Xem tổng hợp)</span>
+            <span class="badge blue">Chưa đọc manga</span>
+        </div>
+        <img class="anime-img" src="Kase-san Series/Kase-san Series.jpg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Kase-san Series</h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+    </div>
+
+    <div class="anime-card" onclick="openModal('Nijigasaki')">
+        <div class="badge-container">
+            <span class="badge">29/29 Tập</span>
+            <span class="badge blue">Đang đợi Part 3</span>
+        </div>
+        <img class="anime-img" src="Nijigasaki High School Idol Club/Nijigasaki_idol.jpeg" alt="Poster">
+        <div class="anime-info">
+            <h3 class="anime-title">Nijigasaki High School Idol Club</h3>
+            <p style="margin:0; font-size: 0.9rem; color: #8b949e;">Nhấp vào để xem chi tiết</p>
+        </div>
+    </div>
+
+</div>
+<!--CONTAINER CỦA FULL MẶT BỘ ANIME-->
+
+<!--KHU THẺ NHÂN VẬT CỦA CÁC BỘ-->
+<!--KHU THẺ BỘ MỚI-->
+<div class="modal" id=" TÊN BỘ ">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Yuki Setsuna.jpg" alt="Setsuna">
+                    <div class="char-name">Yuki Setsuna-Chan ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Setsuna-chan:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Asaka Karin.png" alt="Karin">
+                    <div class="char-name">Asaka Karin-Chan ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Karin-chan:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ MỚI-->
+
+<!--KHU THẺ BỘ The Duke of Death and His Maid-->
+<div class="modal" id="The Duke of Death and His Maid">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="The Duke of Death and His Maid/Bocchan.png" alt="Bocchan">
+                    <div class="char-name">Viktor<br>(Bocchan) ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Bocchan:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="The Duke of Death and His Maid/Lendrott Alice.jpg" alt="Alice">
+                    <div class="char-name">Lendrott Alice ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Alice:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="The Duke of Death and His Maid/Viola.jpg" alt="Viola">
+                    <div class="char-name">Viola</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Viola:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="The Duke of Death and His Maid/Rob.jpg" alt="Rob">
+                    <div class="char-name">Rob</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Rob:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="The Duke of Death and His Maid/Cuff.jpeg" alt="Cuff">
+                    <div class="char-name">Cuff</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Cuff:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="The Duke of Death and His Maid/Zain.jpeg" alt="Zain">
+                    <div class="char-name">Zain</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Zain:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="The Duke of Death and His Maid/Walter.jpeg" alt="Walter">
+                    <div class="char-name">Walter</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Walter:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="The Duke of Death and His Maid/Daleth.jpeg" alt="Daleth">
+                    <div class="char-name">Daleth</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Daleth:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="The Duke of Death and His Maid/Lendrott Sharon.jpeg" alt="Sharon">
+                    <div class="char-name">Sharon</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Sharon:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="The Duke of Death and His Maid/Gerbera.jpg" alt="Gerbera">
+                    <div class="char-name">Gerbera</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Gerbera:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ The Duke of Death and His Maid-->
+
+<!--KHU THẺ BỘ Onii-chan wa Oshimai!-->
+<div class="modal" id="Onii-chan wa Oshimai!">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Onii-chan wa Oshimai!/Oyama Mahiro.png" alt="Mahiro">
+                    <div class="char-name">Oyama Mahiro</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mahiro:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Onii-chan wa Oshimai!/Oyama Mihari.jpeg" alt="Mihari">
+                    <div class="char-name">Oyama Mihari</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mihari:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Onii-chan wa Oshimai!/Hozuki Kaede.jpeg" alt="Kaede">
+                    <div class="char-name">Hozuki Kaede</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kaede:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Onii-chan wa Oshimai!/Hozuki Momiji.jpg" alt="Momiji">
+                    <div class="char-name">Hozuki Momiji</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Momiji:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>            
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Onii-chan wa Oshimai!/Murofushi Miyo.jpeg" alt="Miyo">
+                    <div class="char-name">Murofushi Miyo</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Miyo:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Onii-chan wa Oshimai!/Odoriba Asahi.jpg" alt="Asahi">
+                    <div class="char-name">Odoriba Asahi</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Asahi:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ Onii-chan wa Oshimai!-->
+
+<!--KHU THẺ BỘ Citrus-->
+<div class="modal" id="Citrus">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Citrus/Aihara Yuzu.jpeg" alt="Yuzu">
+                    <div class="char-name">Aihara Yuzu</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yuzu:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Citrus/Aihara Mei.jpeg" alt="Mei">
+                    <div class="char-name">Aihara Mei ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mei:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Citrus/Aihara Ume.jpeg" alt="Ume">
+                    <div class="char-name">Aihara Ume</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Ume:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Citrus/Aihara Sho.webp" alt="Sho">
+                    <div class="char-name">Aihara Sho</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Sho:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Citrus/Momokino Himeko.jpeg" alt="Himeko">
+                    <div class="char-name">Momokino Himeko</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Himeko:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Citrus/Mizusawa Matsuri.png" alt="Matsuri">
+                    <div class="char-name">Mizusawa Matsuri</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Matsuri:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>            
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Citrus/Maruta Kayo.jpg" alt="Kayo">
+                    <div class="char-name">Maruta Kayo</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kayo:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Citrus/Taniguchi Harumi.jpeg" alt="Harumi">
+                    <div class="char-name">Taniguchi Harumi</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Harumi:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Citrus/Tachibana Sara.png" alt="Sara">
+                    <div class="char-name">Tachibana Sara</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Sara:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Citrus/Tachibana Nina.png" alt="Nina">
+                    <div class="char-name">Tachibana Nina</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Nina:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ Citrus-->
+
+<!--KHU THẺ BỘ Your Name-->
+<div class="modal" id="Your Name">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Miyamizu Mitsuha.jpeg" alt="Mitsuha">
+                    <div class="char-name">Miyamizu Mitsuha</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mitsuha:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Tachibana Taki.jpeg" alt="Taki">
+                    <div class="char-name">Tachibana Taki</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Taki:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Miyamizu Hitoha.jpeg" alt="Hitoha">
+                    <div class="char-name">Miyamizu Hitoha</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Hitoha:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Miyamizu Yotsuha.png" alt="Yotsuha">
+                    <div class="char-name">Miyamizu Yotsuha</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yotsuha:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Natori Sayaka.jpeg" alt="Sayaka">
+                    <div class="char-name">Natori Sayaka</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Sayaka:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Teshigawara Katsuhiko.jpeg" alt="Katsuhiko">
+                    <div class="char-name">Teshigawara Katsuhiko</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Katsuhiko:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Miyamizu Futaba.jpeg" alt="Futaba">
+                    <div class="char-name">Miyamizu Futaba</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Futaba:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Okudera Miki.jpg" alt="Miki">
+                    <div class="char-name">Okudera Miki</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Miki:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Fujii Tsukasa.jpeg" alt="Tsukasa">
+                    <div class="char-name">Fujii Tsukasa</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Tsukasa:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Miyamizu Toshiki.jpeg" alt="Toshiki">
+                    <div class="char-name">Miyamizu Toshiki</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Toshiki:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>            
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Your Name/Takagi Shinta.jpeg" alt="Shinta">
+                    <div class="char-name">Takagi Shinta</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Shinta:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ Your Name-->
+
+<!--KHU THẺ BỘ Sakura Trick-->
+<div class="modal" id="Sakura Trick">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sakura Trick/Sonoda Yuu.jpeg" alt="Yuu">
+                    <div class="char-name">Sonoda Yuu</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yuu:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sakura Trick/Takayama Haruka.jpeg" alt="Haruka">
+                    <div class="char-name">Takayama Haruka<br>(Harupoppo)</div> 
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Haruka:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sakura Trick/Lizuka Yuzu.png" alt="Yuzu">
+                    <div class="char-name">Lizuka Yuzu<br>(Yuzupon/Mikan)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yuzu:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sakura Trick/Ikeno Kaede.jpg" alt="Kaede">
+                    <div class="char-name">Ikeno Kaede</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kaede:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>            
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sakura Trick/Noda Kotone.jpeg" alt="Kotone">
+                    <div class="char-name">Noda Kotone</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kotone:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sakura Trick/Minami Shizuku.jpeg" alt="Shizuku">
+                    <div class="char-name">Minami Shizuku</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Shizuku:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sakura Trick/Sonoda Mitsuki.jpeg" alt="Mitsuki">
+                    <div class="char-name">Sonoda Mitsuki</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mitsuki:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sakura Trick/Sakai Rina.png" alt="Rina">
+                    <div class="char-name">Sakai Rina</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Rina:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sakura Trick/Otokawa Sumi.jpeg" alt="Sumi">
+                    <div class="char-name">Otokawa Sumi<br>(Sumi-sumi)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Sumi:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ Sakura Trick-->
+
+<!--KHU THẺ BỘ  Fragtime-->
+<div class="modal" id="Fragtime">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Fragtime/Moritani Misuzu.jpeg" alt="Misuzu">
+                    <div class="char-name">Moritani Misuzu</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Misuzu:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Fragtime/Murakami Haruka.jpeg" alt="Haruka">
+                    <div class="char-name">Murakami Haruka ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Haruka:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Fragtime/Kobayashi Yukari.jpeg" alt="Yukari">
+                    <div class="char-name">Kobayashi Yukari</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yukari:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ  Fragtime-->
+
+<!--KHU THẺ BỘ Bloom Into You-->
+<div class="modal" id="Bloom Into You">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Koito Yuu.jpeg" alt="Yuu">
+                    <div class="char-name">Koito Yuu</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yuu:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>            
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Nanami Touko.png" alt="Touko">
+                    <div class="char-name">Nanami Touko ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Touko:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Nanami Mio.jpeg" alt="Mio">
+                    <div class="char-name">Nanami Mio<br>(Đã mất)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mio:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Saeki Sayaka.png" alt="Sayaka">
+                    <div class="char-name">Saeki Sayaka</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Sayaka:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>            
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Kanou Koyomi.jpeg" alt="Koyomi">
+                    <div class="char-name">Kanou Koyomi</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Koyomi:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Hyuuga Akari.png" alt="Akari">
+                    <div class="char-name">Hyuuga Akari</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Akari:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Maki Seiji.jpeg" alt="Seiji">
+                    <div class="char-name">Maki Seiji</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Seiji:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Doujima Suguru.jpeg" alt="Suguru">
+                    <div class="char-name">Doujima Suguru</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Suguru:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Hakozaki Riko.jpeg" alt="Hakozaki Riko">
+                    <div class="char-name">Hakozaki Riko</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Riko:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Kodama Miyako.png" alt="Miyako">
+                    <div class="char-name">Kodama Miyako</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Miyako:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Bloom Into You/Edamoto Haru.jpeg" alt="Haru">
+                    <div class="char-name"> Edamoto Haru</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Haru:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ Bloom Into You-->
+
+<!--KHU THẺ BỘ Naruto-->
+<div class="modal" id="Naruto">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Uzumaki Naruto.jpg" alt="Naruto">
+                    <div class="char-name">Uzumaki Naruto ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Naruto:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Sasuke.jpeg" alt="Sasuke">
+                    <div class="char-name">Uchiha Sasuke</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Sasuke:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Sakura.png" alt="Sakura">
+                    <div class="char-name">Haruno Sakura ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Sakura:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Kakashi.png" alt="Kakashi">
+                    <div class="char-name">Hatake Kakashi ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kakashi:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Iruka.jpeg" alt="Iruka">
+                    <div class="char-name">Umino Iruka</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Iruka:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Kurama.jpg" alt="Kurama">
+                    <div class="char-name">Kurama ❤<br>(Cửu Vĩ/Kyuubi)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kurama:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Gaara.jpeg" alt="Gaara">
+                    <div class="char-name">Gaara ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Gaara:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Temari.jpg" alt="Temari">
+                    <div class="char-name">Temari</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Temari:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Kankuro.jpg" alt="Kankuro">
+                    <div class="char-name">Kankuro</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kankuro:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Nara Shikamaru.jpeg" alt="Shikamaru">
+                    <div class="char-name">Nara Shikamaru</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Shikamaru:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Akimichi Choji.jpeg" alt="Choji">
+                    <div class="char-name">Akimichi Choji</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Choji:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Yamanaka Ino.jpeg" alt="Ino">
+                    <div class="char-name">Yamanaka Ino</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Ino:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Hyuga Hinata.png" alt="Hinata">
+                    <div class="char-name">Hyuga Hinata</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Hinata:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Inuzuka Kiba.jpeg" alt="Kiba">
+                    <div class="char-name">Inuzuka Kiba</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kiba:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Aburame Shino.jpeg" alt="Shino">
+                    <div class="char-name">Aburame Shino</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Shino:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Rock Lee.jpeg" alt="Lee">
+                    <div class="char-name">Rock Lee</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Lee:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Hyuga Neji.jpeg" alt="Neji">
+                    <div class="char-name">Hyuga Neji</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Neji:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Tenten.jpg" alt="Tenten">
+                    <div class="char-name">Tenten ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Tenten:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Sai.png" alt="Sai">
+                    <div class="char-name">Sai</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Sai:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Tenzo.jpeg" alt="Yamato">
+                    <div class="char-name">Tenzo<br>(Yamato)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yamato:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Orochimaru.png" alt="Orochimaru">
+                    <div class="char-name">Orochimaru</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Orochimaru:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Yakushi Kabuto.jpg" alt="Kabuto">
+                    <div class="char-name">Yakushi Kabuto</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kabuto:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Jiraiya.jpg" alt="Jiraiya">
+                    <div class="char-name">Jiraiya</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Jiraiya:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Senju Tsunade.jpeg" alt="Tsunade">
+                    <div class="char-name"> Senju Tsunade</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Tsunade:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Uchiha Itachi.jpeg" alt="Itachi">
+                    <div class="char-name">Uchiha Itachi</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Itachi:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Nagato.jpg" alt="Nagato">
+                    <div class="char-name">Nagato+Pain<br>(Control Pain)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Nagato+Pain:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Uchiha Obito.jpg" alt="Obito">
+                    <div class="char-name">Uchiha Obito<br>(Tobi)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Tobi:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Uchiha Madara.jpg" alt="Madara">
+                    <div class="char-name">Uchiha Madara</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Madara:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Namikaze Minato.jpg" alt="Minato">
+                    <div class="char-name">Namikaze Minato</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Minato:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Uzumaki Kushina.png" alt="Kushina">
+                    <div class="char-name">Uzumaki Kushina</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kushina:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Naruto/Full Naruto shippuden.jpg" alt="Full Naruto shippuden">
+                    <div class="char-name">Full Naruto shippuden</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Full Naruto shippuden:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ Naruto-->
+
+<!--KHU THẺ BỘ Sunohara-so no Kanrinin-san-->
+<div class="modal" id="Sunohara-so no Kanrinin-san">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sunohara-so no Kanrinin-san/Sunohara Ayaka.jpeg" alt="Ayaka">
+                    <div class="char-name">Sunohara Ayaka</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Ayaka:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sunohara-so no Kanrinin-san/Shiina Aki.jpg" alt="Aki">
+                    <div class="char-name">Shiina Aki</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Aki:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sunohara-so no Kanrinin-san/Yukimoto Yuzu.jpg" alt="Yuzu">
+                    <div class="char-name">Yukimoto Yuzu</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yuzu:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sunohara-so no Kanrinin-san/Yamanashi Sumire.jpeg" alt="Sumire">
+                    <div class="char-name">Yamanashi Sumire ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Sumire:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sunohara-so no Kanrinin-san/Kazami Yuri.jpeg" alt="Yuri">
+                    <div class="char-name">Kazami Yuri</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yuri:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sunohara-so no Kanrinin-san/Sunohara Nana.jpg" alt="Nana">
+                    <div class="char-name">Sunohara Nana</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Nana:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ Sunohara-so no Kanrinin-san-->
+
+<!--KHU THẺ BỘ Gj-bu-->
+<div class="modal" id="Gj-bu">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Gj-bu/Amatsuka Mao.jpg" alt="Mao">
+                    <div class="char-name">Amatsuka Mao</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mao:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Gj-bu/Shinomiya Kyoya.jpeg" alt="Kyoya">
+                    <div class="char-name">Shinomiya Kyoya</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kyoya:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Gj-bu/Sumeragi Shion.jpg" alt="Shion">
+                    <div class="char-name">Sumeragi Shion ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Shion:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Gj-bu/Amatsuka Megumi.png" alt="Megumi">
+                    <div class="char-name">Amatsuka Megumi</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Megumi:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Gj-bu/Bernstein Kirara.jpeg" alt="Kirara">
+                    <div class="char-name">Bernstein Kirara</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kirara:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Gj-bu/Shinomiya Kasumi.jpeg" alt="Kasumi">
+                    <div class="char-name"> Shinomiya Kasumi</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kasumi:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>  
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Gj-bu/Amatsuka Seira.jpeg" alt="Seira">
+                    <div class="char-name">Amatsuka Seira</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Seira:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>            
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Gj-bu/Bernstein Geraldine.jpeg" alt="Geraldine">
+                    <div class="char-name">Bernstein Geraldine</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Geraldine:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>  
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Gj-bu/Mori.jpeg" alt="Mori">
+                    <div class="char-name">Mori</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mori:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>            
+
+        </div>
+        
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ Gj-bu-->
+
+<!--KHU THẺ BỘ Secret Princess Himegoto-->
+<div class="modal" id="Secret Princess Himegoto">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Secret Princess Himegoto/Arikawa Hime.jpg" alt="Hime">
+                    <div class="char-name">Arikawa Hime<br>(Boy fake Girl)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Hime:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Secret Princess Himegoto/Unzen Miyako.jpg" alt="18-kin">
+                    <div class="char-name"> Unzen Miyako<br>(18-kin)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của 18-kin:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Secret Princess Himegoto/Albertina II.jpeg" alt="Albertina II ">
+                    <div class="char-name">Soraeshiki Kosuzu <br>(Albertina II/Aru)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Albertina II:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Secret Princess Himegoto/Ijūin Sadako.jpeg" alt="Unko">
+                    <div class="char-name">Ijūin Sadako<br>(Unko)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Unko:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Secret Princess Himegoto/Arikawa Kaguya.jpg" alt="Kaguya">
+                    <div class="char-name">Arikawa Kaguya<br>(Boy fake Girl)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kaguya:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Secret Princess Himegoto/Mitsunaga Oda.jpg" alt="Oda">
+                    <div class="char-name">Mitsunaga Oda<br>(Boy fake Girl)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Oda:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Secret Princess Himegoto/Ichigo Ichigo.jpeg" alt="Ichigo">
+                    <div class="char-name">Ichigo Ichigo<br>(No.1)<br>(Girl fake Boy)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của No.1:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Secret Princess Himegoto/Toyotomi Hiro.jpeg" alt="Hiro">
+                    <div class="char-name">Toyotomi Hiro<br>(Mori)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mori:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Secret Princess Himegoto/Tadokoro Yuma.jpeg" alt="Yuma">
+                    <div class="char-name">Tadokoro Yuma<br></div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yuma:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Secret Princess Himegoto/Itou Mao.jpeg" alt="Mao">
+                    <div class="char-name">Itou Mao<br></div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mao:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ Secret Princess Himegoto-->
+
+<!--KHU THẺ BỘ Sasayaku You ni Koi wo Utau-->
+<div class="modal" id="Sasayaku You ni Koi wo Utau">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+           <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sasayaku You ni Koi wo Utau/Kino Himari.jpeg" alt="Himari">
+                    <div class="char-name">Kino Himari</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Himari:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sasayaku You ni Koi wo Utau/Asanagi Yori.jpeg" alt="Yori">
+                    <div class="char-name">Asanagi Yori ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yori:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div> 
+
+           <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sasayaku You ni Koi wo Utau/Mizuguchi Miki.jpeg" alt="Miki">
+                    <div class="char-name">Mizuguchi Miki</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Miki:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sasayaku You ni Koi wo Utau/Mizuguchi Aki.jpg" alt="Aki">
+                    <div class="char-name">Mizuguchi Aki</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Aki:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>             
+
+           <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sasayaku You ni Koi wo Utau/Izumi Shiho.jpg" alt="Shiho">
+                    <div class="char-name">Izumi Shiho ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Shiho:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sasayaku You ni Koi wo Utau/Tachibana Kaori.jpeg" alt="Kaori">
+                    <div class="char-name">Tachibana Kaori</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Asanagi Kaori:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div> 
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sasayaku You ni Koi wo Utau/Tsutsui Mari.jpg" alt="Mari">
+                    <div class="char-name">Tsutsui Mari</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Asanagi Mari:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sasayaku You ni Koi wo Utau/Satomiya Momoka.jpeg" alt="Momoka">
+                    <div class="char-name">Satomiya Momoka</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Momoka:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div> 
+
+           <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sasayaku You ni Koi wo Utau/Amasawa Hajime.jpg" alt="Hajime">
+                    <div class="char-name">Amasawa Hajime ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Hajime:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Sasayaku You ni Koi wo Utau/Amasawa Kyo.jpeg" alt="Kyo">
+                    <div class="char-name">Amasawa Kyo<br>Bạn/đối thủ Violin thời thơ ấu của Shiho. Chị gái của Hajime (đã mất)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của kyo:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div> 
+
+        </div>
+
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ BỘ Sasayaku You ni Koi wo Utau-->
+
+<!--KHU THẺ Kase-san Series-->
+<div class="modal" id="Kase-san Series">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Kase-san Series/Yui Yamada.jpeg" alt="Yamada">
+                    <div class="char-name">Yui Yamada</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yui Yamada:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_lanzhu.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Kase-san Series/Tomoka Kase.png" alt="Kase">
+                    <div class="char-name">Tomoka Kase</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Tomoka Kase:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Kase-san Series/Mikawa.jpg" alt="Mikawa">
+                    <div class="char-name">Mikawa<br>(Mikawa-chi)</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Mikawa:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>            
+
+        </div>
+
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ Kase-san Series-->
+
+<!--KHU THẺ NIJIGASAKI-->
+<div class="modal" id="Nijigasaki">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+        
+        <div class="slider-container">
+            
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Yuki Setsuna.jpeg" alt="Setsuna">
+                    <div class="char-name">Yuki Setsuna-Chan ❤<br><span style="font-size: 1.2rem; color: #ad8bfd;">Idol đời đầu (Người sáng lập club)</span></div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Setsuna-chan: Chase!</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Setsuna Yuki - Chase!.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Uehara Ayumu.png" alt="Ayumu">
+                    <div class="char-name">Uehara Ayumu-Chan<br><span style="font-size: 1.2rem; color: #ad8bfd;">Công thần cứu vớt và hồi sinh club (Idol đầu tiên của thế hệ mới)</span></div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Ayumu-chan: Kaika Sengen</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Ayumu Uehara- Kaika Sengen.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Asaka Karin.png" alt="Karin">
+                    <div class="char-name">Asaka Karin-Chan ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Karin-chan: Fire Bird</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Fire Bird - Karin Asaka.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc Team Diver&Diva (Ai-chan + Karin-chan): Eternal Light (Hay)</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Eternal Light ( Diver&Diva team Ai-chan + Karin-chan ).mp3" type="audio/mpeg">
+                        </audio>
+                    </div>                    
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Zhong Lanzhu.jpg" alt="LanzhuZhong">
+                    <div class="char-name">Zhong Lanzhu-Chan ❤<br>(Chung Lam Châu-chan)
+    <span style="font-size: 1.2rem; color: #ad8bfd;"></span></div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Lanzhu-chan: Queendom (Hay)</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Queendom - Lanzhu Zhong.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Lanzhu-chan: Ye Mingzhu (Hay)</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Ye Mingzhu - Lanzhu Zhong.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>                    
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Nakano Kasumi.jpg" alt="Kasumi">
+                    <div class="char-name">Nakano Kasumi-Chan ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kasumi-chan:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Osaka Shizuku.jpg" alt="Shizuku">
+                    <div class="char-name">Osaka Shizuku-Chan </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Shizuku-chan: Audrey</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Osaka Shizuku - Audrey.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Miyashita Ai.jpg" alt="Ai">
+                    <div class="char-name">Miyashita Ai-Chan </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Ai-chan: Yuu&Ai</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Ai Miyashita - Yuu & Ai.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc Team Diver&Diva (Ai-chan + Karin-chan): Eternal Light (Hay)</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Eternal Light ( Diver&Diva team Ai-chan + Karin-chan ).mp3" type="audio/mpeg">
+                        </audio>
+                    </div>                    
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Konoe Kanata.png" alt="Kanata">
+                    <div class="char-name">Konoe Kanata-Chan </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Kanata-chan:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Tennoji Rina.jpg" alt="Rina">
+                    <div class="char-name">Tennoji Rina-Chan </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Rina-chan:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Emma Verde.jpg" alt="Emma">
+                    <div class="char-name">Emma Verde-Chan </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Emma-chan:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Mifune Shioriko.jpg" alt="Shioriko">
+                    <div class="char-name">Mifune Shioriko-Chan </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Shioriko-chan: Emotion (Sâu sắc)</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Mifune Shioriko - Emotion.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Mia Taylor.png" alt="Taylor">
+                    <div class="char-name">Mia Taylor-Chan </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Taylor-chan:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Takasaki Yu.jpeg" alt="Yu">
+                    <div class="char-name">Takasaki Yu-Chan </div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Yu-chan:</p>
+                        <audio controls class="char-audio">
+                            <source src="link_nhac_karin.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+            <div class="char-slide">
+                <div class="char-card-box">
+                    <img class="char-img-vertical" src="Nijigasaki High School Idol Club/Love Live! Nijigasaki High School Idol Club.jpg" alt="Nijigasaki High School Idol Club">
+                    <div class="char-name">Love Live! Nijigasaki High School Idol Club ❤</div>
+                    <div class="audio-player-box">
+                        <p>🎵 Nhạc của Nijigasaki High School Idol Club ❤:</p>
+                        <audio controls class="char-audio">
+                            <source src="Nijigasaki High School Idol Club/Love Live! Nijigasaki High School Idol Club music.mp3" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="swipe-hint">Kéo / Vuốt sang trái để lật thẻ tiếp theo ➔</div>
+    </div>
+</div>
+<!--KHU THẺ NIJIGASAKI-->
+<!--KHU THẺ NHÂN VẬT CỦA CÁC BỘ-->
+
+    <!-- Bọc toàn bộ cái bảng cũ vào đây -->
+<div id="hot-widget" class="hot-list">
+    
+    <!-- Nút "Điều khiển" đặt trên cùng -->
+    <div id="controls" style="text-align: right; cursor: pointer; padding-bottom: 5px;">
+        <span onclick="toggleWidget()">🔥 / ✕</span>
+    </div>
+
+    <!-- Nội dung bảng cũ của sếp -->
+    <div id="widget-content">
+        <h3>🔥 Hot Anime</h3>
+        
+        <div class="hot-item" onclick="openModal('Nijigasaki')">
+            <img src="Nijigasaki High School Idol Club/Nijigasaki_idol.jpeg" alt="Anime">
+            <span>Nijigasaki High School Idol Club</span>
+        </div>
+
+        <div class="hot-item" onclick="openModal('Bloom Into You')">
+            <img src="Bloom Into You/Bloom Into You.jpeg" alt="Anime">
+            <span>Bloom Into You</span>
+        </div>
+
+        <div class="hot-item" onclick="openModal('Naruto')">
+            <img src="Naruto/Naruto.jpeg" alt="Anime">
+            <span>Naruto</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. MODAL & NHẠC ---
+    let currentModalId = ''; 
+    function openModal(modalId) {
+        currentModalId = modalId;
+        document.getElementById(modalId).classList.add('active');
+    }
+    function closeModal() {
+        if(!currentModalId) return;
+        let modal = document.getElementById(currentModalId);
+        modal.classList.remove('active');
+        const audios = modal.querySelectorAll('.char-audio');
+        audios.forEach(audio => { audio.pause(); audio.currentTime = 0; });
+        currentModalId = '';
+    }
+    window.onclick = (e) => {
+        if (currentModalId && e.target == document.getElementById(currentModalId)) closeModal();
+    };
+
+    // --- 2. WIDGET KÉO THẢ (FIX LỖI KÉO SLIDER) ---
+    const widget = document.getElementById('hot-widget');
+    const content = document.getElementById('widget-content');
+    const header = document.getElementById('controls');
+
+    function toggleWidget() {
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            widget.style.width = '160px';
+        } else {
+            content.style.display = 'none';
+            widget.style.width = 'auto';
+        }
+    }
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    // CHỈ KÉO KHI NHẤN VÀO HEADER
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - widget.offsetLeft;
+        offsetY = e.clientY - widget.offsetTop;
+    });
+
+    header.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        offsetX = e.touches[0].clientX - widget.offsetLeft;
+        offsetY = e.touches[0].clientY - widget.offsetTop;
+    }, {passive: false});
+
+    // SỬA CHỖ NÀY: Dùng window thay vì document để bắt sự kiện chuẩn hơn
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return; // Nếu không nhấn vào header thì KHÔNG LÀM GÌ CẢ
+        // e.preventDefault()
+        widget.style.left = (e.clientX - offsetX) + 'px';
+        widget.style.top = (e.clientY - offsetY) + 'px';
+        widget.style.right = 'auto'; widget.style.bottom = 'auto';
+    });
+
+    window.addEventListener('touchmove', (e) => {
+        if (!isDragging) return; // Nếu không nhấn vào header thì để slider hoạt động
+        widget.style.left = (e.touches[0].clientX - offsetX) + 'px';
+        widget.style.top = (e.touches[0].clientY - offsetY) + 'px';
+        widget.style.right = 'auto'; widget.style.bottom = 'auto';
+    }, {passive: false});
+
+    window.addEventListener('mouseup', stopDrag);
+    window.addEventListener('touchend', stopDrag);
+
+    function stopDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+        let winW = window.innerWidth;
+        if (widget.offsetLeft + widget.offsetWidth / 2 > winW / 2) {
+            widget.style.left = (winW - widget.offsetWidth - 10) + 'px';
+        } else {
+            widget.style.left = '10px';
+        }
+        widget.style.right = 'auto';
+    }
+</script>
+ </body>
+</html>
